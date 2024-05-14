@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			#b {
+				background-color: antiquewhite;
+				color: blue;
+			}
+			#all{
+				background-color: azure;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="app">
+			<show-rect a="6" b="6"></show-rect>
+			<show-rect a="8" b="8"></show-rect>
+
+			<show-list title="性别为男" :iteams="students.filter(s => s.gender=='男')"></show-list>
+			<show-list title="2210班" :iteams="students.filter(s => s.class=='信工2210')"></show-list>
+			<show-list :iteams="students"></show-list>
+
+		</div>
+		<script>
+			// 局部注册
+			const showRect = {
+				data() {
+					return {
+						numa: 0,
+						numb: 0,
+					}
+				},
+				// a:搞 b:宽
+				props: ['a', 'b'],
+				// props: ['iteam']
+				template: `宽<input type="number" v-model='numb'><br>
+						高<input type="number" v-model='numa'>
+				<div v-for="i in numa>0?numa:parseInt(a)"  id="all">
+			                            <span v-for="j in numb>0?numb: parseInt(b)">‍🦳</span>
+			                    </div>`
+			}
+			// 学生表组件
+			const showlist = {
+				props: ['iteams','title'],
+				template: `{{title}}<table border='1' id="b">
+					<tr>
+						<th>id</th>
+						<th>姓名</th>
+						<th>年龄</th>
+						<th>年龄</th>
+						<th>班级</th>
+					</tr>
+					<tr v-for="stu in iteams" >
+						<td>{{stu.id}}</td>
+						<td>{{stu.name}}</td>
+						<td>{{stu.age}}</td>
+						<td>{{stu.gender}}</td>
+						<td>{{stu.class}}</td>
+					</tr>
+				</table>`
+			}
+			const app = Vue.createApp({
+				data() {
+					return {
+						students: [{
+								id: 2,
+								name: '绩优',
+								age: 22,
+								gender: '女',
+								class: '信工2210'
+							},
+							{
+								id: 3,
+								name: '苏缇',
+								age: 80,
+								gender: '女',
+								class: '信工2210'
+							},
+							{
+								id: 4,
+								name: '清河月色',
+								age: 8,
+								gender: '男',
+								class: '信工2210'
+							},
+							{
+								id: 5,
+								name: '难忘喵喵',
+								age: 18,
+								gender: '男',
+								class: '信工2210'
+							}
+						],
+					}
+				},
+				components: {
+					'show-rect': showRect,
+					'show-list': showlist
+				},
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

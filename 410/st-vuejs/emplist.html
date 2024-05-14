@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css" />
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+		<script src="//unpkg.com/element-plus"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	</head>
+	<style>
+		.demo-form-inline .el-input {
+			--el-input-width: 220px;
+		}
+
+		.demo-form-inline .el-select {
+			--el-select-width: 220px;
+		}
+
+		#app {
+			margin: 0 auto;
+		}
+	</style>
+	<body>
+		<div id="app">
+			<h3>员工列表</h3>
+			<el-dialog v-model="dialogEmpVisible" @closed="dialogClose" :title="dialogtitle" width="500">
+				<el-form :rules="rules" ref="empFormRef" :model="emp">
+					{{emp}}
+					<el-form-item label="编号:" :label-width="formLabelWidth" prop="empno">
+						<el-input v-model.number="emp.empno" autocomplete="off" />
+					</el-form-item>
+					<el-form-item label="姓名:" :label-width="formLabelWidth" prop="ename">
+						<el-input v-model="emp.ename" autocomplete="off" />
+					</el-form-item>
+					<!-- <el-form-item label="职位:" :label-width="formLabelWidth">
+						<el-input v-model="emp.job" autocomplete="off" />
+					</el-form-item> -->
+					<el-form-item label="职位" :label-width="formLabelWidth">
+						<el-select v-model="emp.job" style="width: 200px" placeholder="请选择职位">
+							<el-option v-for="job in jobs" :label="job" :value="job"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="上级:" :label-width="formLabelWidth" prop="mgr">
+						<el-select v-model="emp.mgr" placeholder="请选择上级" style="width: 200px">
+							<el-option v-for="e in empMgr" :label="e.ename" :value="e.empno"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="入职日期:" :label-width="formLabelWidth">
+						<el-date-picker v-model="emp.hiredate" type="date" placeholder="请选择日期" />
+						<!-- <el-input v-model="emp.hiredate" autocomplete="off" /> -->
+					</el-form-item>
+					<el-form-item label="工资:" :label-width="formLabelWidth">
+						<el-input v-model="emp.sal" autocomplete="off" />
+					</el-form-item>
+					<el-form-item label="奖金:" :label-width="formLabelWidth">
+						<el-input v-model="emp.comm" autocomplete="off" />
+					</el-form-item>
+					<el-form-item label="部门:" :label-width="formLabelWidth">
+						<el-select v-model="emp.dept.deptno" placeholder="请选择部门" style="width: 200px">
+							<el-option v-for="d in depts" :label="d.dname" :value="d.deptno"></el-option>
+						</el-select>
+					</el-form-item>
+				</el-form>
+				<template #footer>
+					<div class="dialog-footer">
+						<el-button @click="cancel">取 消</el-button>
+						<el-button type="primary" @click="empAdd" >确认</el-button>
+					</div>
+				</template>
+			</el-dialog>
+
+			<el-form :inline="true" :model="empCondition">
+				<el-form-item label="姓名:">
+					<el-input v-model="empCondition.ename" placeholder="请输入要查询的名字" clearable></el-input>
+				</el-form-item>
+				<el-form-item label="职位" style="width: 200px;">
+					<el-select v-model="empCondition.job" placeholder="请选择职位" clearable>
+						<el-option v-for="job in jobs" :label="job" :value="job"></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="empSearch">搜索</el-button>
+				</el-form-item>
+			</el-form>
+
+			<el-button @click="openDialog(1)">添加员工</el-button>
+
+			<hr>
+			<el-table :data="pageInfo.list" style="width: 1000px" border="1" stripe>
+				<el-table-column prop="empno" label="编号"></el-table-column>
+				<el-table-column prop="ename" label="姓名"></el-table-column>
+				<el-table-column prop="job" label="职位" width="120"></el-table-column>
+				<el-table-column prop="mgr" label="领导"></el-table-column>
+				<el-table-column prop="hiredate" label="入职日期" width="120"></el-table-column>
+				<el-table-column prop="sal" label="工资"></el-table-column>
+				<el-table-column prop="comm" label="奖金"></el-table-column>
+				<el-table-column prop="dept.dname" label="部门" width="120"></el-table-column>
+				<el-table-column label="操作" width="200">
+					<template #default="scope">
+						<!-- <el-popconfirm @confirm="openupdate(scope.row)" slot-scope="scope" title="是否要更新数据？">
+							<template #reference> -->
+						<el-button @click="openDialog(2,scope.row)" type="success">修改</el-button>
+						<!-- </template> -->
+						</el-popconfirm>
+						<el-popconfirm @confirm="del(scope.row.empno)" slot-scope="scope" title="删除此行？">
+							<template #reference>
+								<el-button type="danger">删除</el-button>
+							</template>
+						</el-popconfirm>
+					</template>
+				</el-table-column>
+			</el-table>
+			<br>
+			<el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next"
+				:total="pageInfo.total" />
+		</div>
+
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {
+						pageInfo: {
+							pageNum: 1,
+						},
+						jobs: [],
+						empCondition: {
+							ename: '',
+							job: ''
+						},
+						dialogEmpVisible: false,
+						dialogtitle: '新增员工',
+						dialogtype: 'add',
+						emp: {
+							dept: {}
+						},
+						empMgr: [],
+						depts: [],
+						formLabelWidth: '120px',
+						rules: {
+							empno: [{
+									required: true,
+									message: '请输入编号',
+									trigger: 'blur'
+								},
+								{
+									type: 'number',
+									message: '编号必须为数字'
+								},
+							],
+							ename: [{
+									required: true,
+									message: '请输入名字',
+									trigger: 'blur'
+								},
+								{
+									min: 3,
+									max: 5,
+									message: '长度为3-5之间',
+									trigger: 'blur'
+								},
+							],
+							mgr: [{
+								required: true,
+								message: '请选择上级',
+								trigger: 'change'
+							}]
+						}
+					}
+				},
+				mounted() {
+					//应用挂载
+					console.log('mounted');
+					this.getData();
+					this.getjobs();
+				},
+				methods: {
+					refresh(){
+						this.$forceUpdate();
+					},
+					getData() {
+						let postData = new URLSearchParams();
+						postData.append('page', this.pageInfo.pageNum);
+						postData.append('ename', this.empCondition.ename);
+						postData.append('job', this.empCondition.job ? this.empCondition.job : '');
+
+						axios.post('http://localhost:8080/emp-mgr/EmpSearchServlet', postData)
+							.then(response => {
+								this.pageInfo = response.data
+							})
+					},
+					getjobs() {
+						axios.post('http://localhost:8080/emp-mgr/EmpJobServlet')
+							.then(response => {
+								this.jobs = response.data
+							})
+						axios.post('http://localhost:8080/emp-mgr/EmpServlet')
+							.then(response => {
+								this.empMgr = response.data
+							})
+						axios.post('http://localhost:8080/emp-mgr/DeptServlet')
+							.then(response => {
+								this.depts = response.data
+							})
+
+					},
+					del(empno) {
+						let postData = new URLSearchParams();
+						postData.append('empno', empno);
+						axios.post('http://localhost:8080/emp-mgr/DeleteServlet', postData)
+							.then(response => {
+								var result = response.data;
+								if (result.code == 1) {
+									ElementPlus.ElMessage({
+										message: '恭喜你，删除成功！！！',
+										type: 'success',
+									});
+								} else {
+									ElementPlus.ElMessage.error('filure,' + result.resultMsg)
+								}
+							})
+
+					},
+					handleCurrentChange(val) {
+						this.pageInfo.pageNum = val;
+						this.getData();
+					},
+					empSearch() {
+						this.getData();
+					},
+					openDialog(type, emp) {
+						if (type == 1) {
+							this.dialogtitle = '添加员工';
+							this.dialogtype = 'add';
+						} else {
+							this.emp=emp;
+							this.dialogtitle = '修改员工';
+							this.dialogtype = 'update';
+						}
+						this.dialogEmpVisible = true;
+					},
+					dialogClose() {
+						this.emp = {
+							dept: {}
+						}
+						this.$refs.empFormRef.resetFields();
+					},
+					empAdd() {
+						this.$refs.empFormRef.validate((valid) => {
+							if (!valid) {
+								return;
+							}
+							// 数据提交
+							let postData = new URLSearchParams();
+							postData.append('empStr', JSON.stringify(this.emp));
+							postData.append('action', this.dialogtype);
+							axios.post('http://localhost:8080/emp-mgr/EmpAddServlet', postData)
+								.then(response => {
+									var result = response.data;
+									if (result.code == 1) {
+										ElementPlus.ElMessage({
+											message: '恭喜你，成功了！！！',
+											type: 'success',
+										});
+										this.dialogEmpVisible = false
+										this.emp = {
+											dept: {}
+										}
+									} else {
+										ElementPlus.ElMessage.error('filure,' + result.resultMsg)
+									}
+								})
+						})
+					},
+					cancel() {
+						this.dialogEmpVisible = false
+					}
+				},
+			});
+			const vm = app.use(ElementPlus).mount('#app');
+			// const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

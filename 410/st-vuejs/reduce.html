@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="app">
+			<h1>course:{{num}}</h1>
+			<h2>title：{{title}}</h2>
+			<h4 v-bind:title="message">我是标题喵喵喵`</h4>
+		</div>
+		
+		
+		<script>
+			const app = Vue.createApp({
+						data() {
+							return {
+								num: 10,
+								title: 'i am title',
+								message:'喵喵喵~'
+							}
+						},
+					methods: {
+						decline() {
+							this.num--;
+							console.log('将num减一');
+						}
+					}
+			});
+			const vm=app.mount('#app');
+			
+			// document.write(vm.num);
+			// vm.decline();
+		</script>
+	</body>
+</html>

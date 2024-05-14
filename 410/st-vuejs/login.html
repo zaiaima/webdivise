@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			#b {
+				background-color: antiquewhite;
+				color: blue;
+			}
+			#all{
+				margin-top: 10px auto;
+				background-image: url("img/4.jfif");
+				width: 500px;
+				height: 500px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="app">
+			<show-shap id="all"></show-shap>
+			
+		</div>
+		<script>
+			// 局部注册
+			const showshap = {
+				data() {
+					return {
+						
+					}
+				},
+				template:`<table>
+				<h2>登录</h2>
+				<tr>
+					<td>姓名</td>
+					<td><input type="text"/></td>
+				</tr>
+				<tr>
+					<td>密码</td>
+					<td><input type="text"/></td>
+				</tr>
+			</table>`
+			}
+			
+			const app = Vue.createApp({
+				data() {
+					return {
+					}
+				},
+				components: {
+					'show-shap': showshap,
+				},
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

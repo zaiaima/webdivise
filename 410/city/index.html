@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css" />
+		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+		<script src="//unpkg.com/element-plus"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<el-table :data="pageInfo.list" stripe style="width: 800px">
+				<el-table-column prop="id" label="id"></el-table-column>
+				<el-table-column prop="name" label="Name"></el-table-column>
+				<el-table-column prop="countryCode" label="countryCode"></el-table-column>
+				<el-table-column prop="district" label="District"></el-table-column>
+				<el-table-column prop="population" label="Population"></el-table-column>
+			</el-table>
+			<el-pagination background layout="prev, pager, next" :total="pageInfo.total"
+				v-model:current-page="pageInfo.pageNum" v-model:page-size="pageInfo.pageSize"
+				@current-change="handleCurrentChange" />
+
+		</div>
+
+		<script>
+			const App = Vue.createApp({
+				data() {
+					return {
+						pageInfo: {
+							pageNum: 1,
+						},
+
+					}
+				},
+				mounted() {
+					console.log("mounted")
+					this.getData();
+				},
+				methods: {
+					getData() {
+						let param = new URLSearchParams()
+						param.append("pageNum", this.pageInfo.pageNum);
+						axios.post('http://localhost:8080/test2/CityServlet', param)
+							.then(response => {
+								this.pageInfo = response.data
+								console.log(this.pageInfo);
+							});
+					},
+
+					handleCurrentChange(val) {
+						this.pageInfo.crtPage = val;
+						this.getData();
+
+					},
+				}
+			});
+			const vm = App.use(ElementPlus).mount("#app");
+		</script>
+	</body>
+</html>

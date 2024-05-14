@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="app">
+			<show-table :items="emps"></show-table><br>
+			<show-table title="工资大于2000" :items="emps.filter(s => s.sal==2000 )"></show-table><br>
+			<show-table title="部门为SALES" :items="emps.filter(s => s.dept=='SALES')"></show-table>
+		</div>
+
+		<script>
+			const showtable = {
+				props: ['items', 'title'],
+				template: `
+                                <table border="1">
+                                        <tr>
+                                                <th>编号</th>
+                                                <th>姓名</th>
+                                                <th>职位</th>
+                                                <th>工资</th>
+                                                <th>部门</th>
+                                        </tr>
+                                        <tr v-for="ep in items" @click="showName(ep)" >
+                                                <td>{{ep.empno}}</td>
+                                                <td>{{ep.ename}}</td>
+                                                <td>{{ep.job}}</td>
+                                                <td>{{ep.sal}}</td>
+                                                <td>{{ep.dept}}</td>
+                                        </tr>
+                                </table>
+                                
+                                
+                                
+                                `
+
+
+			}
+
+
+
+			const app = Vue.createApp({
+				data() {
+					return {
+						emps: [{
+								empno: 7369,
+								ename: 'SMITH',
+								job: 'CLERK',
+								sal: 1700,
+								dept: 'RESEARCH'
+							},
+							{
+								empno: 7499,
+								ename: 'ALLEN',
+								job: 'SALESMAN',
+								sal: 2000,
+								dept: 'SALES'
+							},
+							{
+								empno: 7900,
+								ename: 'JAMES',
+								job: 'CLERK',
+								sal: 2000,
+								dept: 'SALES'
+							},
+							{
+								empno: 7876,
+								ename: 'ADAMS',
+								job: 'CLERK',
+								sal: 2000,
+								dept: 'RESEARCH'
+							},
+							{
+								empno: 7934,
+								ename: 'MILLER',
+								job: 'CLERK',
+								sal: 1700,
+								dept: 'ACCOUNTIN'
+							},
+							{
+								empno: 7698,
+								ename: 'BLAKE',
+								job: 'CLERK',
+								sal: 3650,
+								dept: 'SALES'
+							},
+
+						],
+
+
+					}
+				},
+				components: {
+					'show-table': showtable
+
+				}
+
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

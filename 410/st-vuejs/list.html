@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<style type="text/css">
+			#tabletext {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="app">
+			<button @click="this.isshow=!this.isshow">新增开关</button>
+			<div>
+				<h3>学生表</h3>
+
+				<table border="1" width="500px" id="b">
+					<tr>
+						<th>id</th>
+						<th>姓名</th>
+						<th>年龄</th>
+						<th>年龄</th>
+						<th>班级</th>
+						<th>操作</th>
+					</tr>
+					<tr v-for="stu in students">
+						<td>{{stu.id}}</td>
+						<td>{{stu.name}}</td>
+						<td>{{stu.age}}</td>
+						<td>{{stu.gender}}</td>
+						<td>{{stu.class}}</td>
+						<td>
+							<button @click="del(stu)">删除</button>
+							<button @click="showName(stu)">修改</button>
+						</td>
+
+					</tr>
+				</table>
+
+				{{crtstu}}
+			</div>
+
+			<!-- 修改方法 -->
+			<div v-show="dialogshow">
+				<h4>修改方法</h4>
+				<table id="b">
+					<tr>
+						<td>id</td>
+						<td><input type="text" v-model="crtstu.id" /></td>
+					</tr>
+					<tr>
+						<td>姓名</td>
+						<td><input v-model="crtstu.name" /></td>
+					</tr>
+					<tr>
+						<td>年龄</td>
+						<td><input type="text" v-model="crtstu.age" /></tdd>
+					</tr>
+					<tr>
+						<td>性别</td>
+						<td><input type="radio" value="男" v-model="crtstu.gender">男
+							<input type="radio" value="女" v-model="crtstu.gender">女
+						</td>
+					</tr>
+					<tr>
+						<td>班级</td>
+						<td><select v-model="crtstu.class">
+								<option value="-1">----请选择----</option>
+								<option value="信工2210">信工2210</option>
+								<option value="信工2211">信工2211</option>
+								<option value="信工2212">信工2212</option>
+							</select></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<button @click="cancelupdate">取消</button>
+							<button @click="okupdate">确定</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<!-- 新增方法 -->
+			<div v-show="isshow">
+				<h3>新增学生</h3>
+				<table id="b">
+					<tr>
+						<td>id</td>
+						<td><input type="text" v-model="newstu.id" /></td>
+					</tr>
+					<tr>
+						<td>姓名</td>
+						<td><input v-model="newstu.name" /></td>
+					</tr>
+					<tr>
+						<td>年龄</td>
+						<td><input type="text" v-model="newstu.age" /></tdd>
+					</tr>
+					<tr>
+						<td>性别</td>
+						<td><input type="radio" value="男" v-model="newstu.gender">男
+							<input type="radio" value="女" v-model="newstu.gender">女
+						</td>
+					</tr>
+					<tr>
+						<td>班级</td>
+						<td><select v-model="newstu.class">
+								<option value="-1">----请选择----</option>
+								<option value="信工2210">信工2210</option>
+								<option value="信工2211">信工2211</option>
+								<option value="信工2212">信工2212</option>
+							</select></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<button @click="canceladd">取消</button>
+							<button @click="add">添加</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<ul>
+				<li v-for="name in names">{{name}}</li>
+			</ul>
+		</div>
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {
+						gender: '',
+						stuClass: -1,
+						isshow: true,
+						students: [{
+								id: 2,
+								name: '绩优',
+								age: 22,
+								gender: '女',
+								class: '信工2210'
+							},
+							{
+								id: 3,
+								name: '苏缇',
+								age: 80,
+								gender: '女',
+								class: '信工2210'
+							},
+							{
+								id: 4,
+								name: '清河月色',
+								age: 8,
+								gender: '男',
+								class: '信工2210'
+							},
+							{
+								id: 5,
+								name: '难忘喵喵',
+								age: 18,
+								gender: '男',
+								class: '信工2210'
+							}
+						],
+						names: [],
+						// newstu:[]
+						crtstu: {},
+						newstu: {},
+						dialogshow: false,
+						isshow: false
+					}
+				},
+				mounted() {
+					console.log('mounted')
+					axios.get('data/students.json')
+						.then(response => {
+							//处理成功情况
+							console.log(response)
+							this.crtstu = response.data
+						});
+
+				},
+				methods: {
+					showName(stu) {
+						this.names.push(stu.id + stu.name)
+						Object.assign(this.crtstu, stu)
+						this.dialogshow = true;
+					},
+					okupdate() {
+						this.dialogshow = false;
+						// 修改
+						const index = this.students.findIndex(s => s.id == this.crtstu.id);
+						this.students[index] = this.crtstu;
+						this.crtstu = {};
+					},
+					cancelupdate() {
+						// this.dialogshow=false;
+						this.crtstu = {}
+					},
+					canceladd() {
+						this.newstu = {}
+					},
+					add() {
+						this.students.push(this.newstu)
+						this.newstu = {}
+					},
+					del(stu) {
+						if (confirm("您想好了吗？")) {
+							const index = this.students.findIndex(s => s.id == stu.id);
+							this.students.splice(index, 1);
+						}
+					}
+
+				}
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+
+		<div id="app">
+			<h3>我是小久</h3>
+
+			<my-first-cpnt></my-first-cpnt>
+
+			<my-counter-cpnt></my-counter-cpnt>
+
+		</div>
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {}
+				},
+			});
+			// 全局注册
+			app.component('my-first-cpnt', {
+				template: '<h3>我是!!!!我定是！！！！</h3>'
+			});
+			app.component('my-counter-cpnt', {
+				data() {
+					return {
+						counter: 1
+					}
+				},
+				template: '<button @click="counter++">+1</button>{{counter}}'
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

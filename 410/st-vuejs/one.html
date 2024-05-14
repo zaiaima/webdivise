@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css" />
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+		<script src="//unpkg.com/element-plus"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	</head>
+	<style>
+		.demo-form-inline .el-input {
+			--el-input-width: 220px;
+		}
+
+		.demo-form-inline .el-select {
+			--el-select-width: 220px;
+		}
+
+		#app {
+
+			margin: 0 auto;
+		}
+	</style>
+	<body>
+		<div id="app">
+			<el-dialog title="新增员工" v-model="dialogempVisible">
+				<el-form :model="emp">
+					<el-form-item label="请输入编号:" :label-width="formLabelWidth">
+						<el-input v-model="emp.empno" autocomplete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="姓名:" :label-width="formLabelWidth">
+						<el-input v-model="emp.name" autocomplete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="职位:" :label-width="formLabelWidth">
+						<el-input v-model="emp.job" autocomplete="off"></el-input>
+					</el-form-item>
+					<!-- <el-form-item label="职位:" :label-width="formLabelWidth">
+							<el-input v-model="emp.sal" autocomplete="off"></el-input>
+						</el-form-item>
+						<el-form-item label="职位:" :label-width="formLabelWidth">
+							<el-input v-model="emp.comm" autocomplete="off"></el-input>
+						</el-form-item> -->
+				</el-form>
+				<template #footer>
+					<div class="dialog-footer">
+						<el-button @click="dialogempVisible = false">取 消</el-button>
+						<el-button type="primary" @click="dialogempVisible = false">确 定</el-button>
+					</div>
+				</template>
+			</el-dialog>
+
+
+		</div>
+		<!-- 查询功能 -->
+		<h3>{{empCondition}}</h3>
+			<el-form :inline="true" :model="empCondition" class="demo-form-inline">
+				<el-form-item label="姓名:">
+					<el-input v-model="empCondition.ename" placeholder="请输入要查询的名字" clearable></el-input>
+				</el-form-item>
+				<el-form-item label="职位" style:width="120px">
+					<el-select v-model="empCondition.job" placeholder="请选择职位" clearable>
+						<el-option v-for="job in jobs" :label="job" :value="job"></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="empSearch">百度一下</el-button>
+				</el-form-item>
+			</el-form>
+		<el-button type="text" @click="dialogempVisible = true">打开嵌套表单的 Dialog</el-button>
+		<!-- 表单 -->
+			<el-table :data="pageInfo.list" style="width: 800px" border="1" stripe>
+				<el-table-column prop="empno" label="编号"></el-table-column>
+				<el-table-column prop="ename" label="姓名"></el-table-column>
+				<el-table-column prop="job" label="职位"></el-table-column>
+				<el-table-column prop="mgr" label="领导"></el-table-column>
+				<el-table-column prop="hiredate" label="入职日期" width="120"></el-table-column>
+				<el-table-column prop="sal" label="工资"></el-table-column>
+				<el-table-column prop="comm" label="奖金"></el-table-column>
+				<el-table-column prop="dept.dname" label="部门" width="120"></el-table-column>
+			</el-table>
+		<!-- 页码 -->
+		<el-pagination @current-change="handleCurrentChange" background layout="prev, pager, next"
+			:total="pageInfo.total" />
+
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {
+						dialogTableVisible: false,
+						dialogempVisible: false,
+						pageInfo: {
+							pageNum: 1,
+						},
+						jobs: [],
+						empCondition: {
+							ename: '',
+							job: ''
+						},
+
+						emp: {
+							empno: '';
+							name: '',
+							job: '',
+							sal: '',
+							comm: '',
+							// delivery: false
+						},
+						formLabelWidth: '120px'
+					}
+				},
+				mounted() {
+					//应用挂载
+					console.log('mounted');
+					console.log(this.pageInfo)
+					this.getData();
+					this.getjobs();
+				},
+				methods: {
+					getData() {
+						let postData = new URLSearchParams();
+						postData.append('page', this.pageInfo.pageNum);
+						postData.append('ename', this.empCondition.ename);
+						postData.append('job', this.empCondition.job ? this.empCondition.job : '');
+
+						axios.post('http://localhost:8080/emp-mgr/EmpSearchServlet', postData)
+							.then(response => {
+								console.log(response.data);
+								this.pageInfo = response.data
+							});
+					},
+					getjobs() {
+						axios.post('http://localhost:8080/emp-mgr/EmpJobServlet')
+							.then(response => {
+								this.jobs = response.data
+							});
+					},
+					handleCurrentChange(val) {
+						this.pageInfo.pageNum = val;
+						this.getData();
+					},
+					empSearch() {
+						this.getData();
+					},
+					// dialogFormVisiblecancel() {
+					// 	this.dialogFormVisible = false
+					// },
+					// dialogTableVisible(){
+					// 	this.dialogTableVisible=true;
+					// }
+					dialogFormVisible() {
+						dialogFormVisible = true
+					},
+				},
+			});
+			const vm = app.use(ElementPlus).mount('#app');
+			// const vm = app.mount('#app');
+		</script>
+	</body>
+</html>

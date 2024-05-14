@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>指令 v-model</title>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="app">
+			
+			<button type="button" @click="this.isshow=!this.isshow">开关</button>
+			<div v-show="isshow">
+			
+			
+			
+			<h3>框内的值：{{msg}}</h3>
+			<input type="text" v-model="msg" >
+			
+			<h3>你的选择是：{{gender}}</h3>
+			<input type="radio" value="男" v-model="gender">男
+			<input type="radio" value="女" v-model="gender">女<br />
+			
+			<h3>你选择的班级是：{{stuClass}}</h3>
+			<select v-model="stuClass">
+				<option value="-1">---请选择---</option>
+				<option value="信工2201">---信工2201---</option>
+				<option value="信工2202">---信工2202---</option>
+				<option value="信工2203">---信工2203---</option>
+				<option value="信工2204">---信工2204---</option>
+				<option value="信工2205">---信工2205---</option>
+				<option value="信工2206">---信工2206---</option>
+				<option value="信工2207">---信工2207---</option>
+				<option value="信工2208">---信工2208---</option>
+				<option value="信工2209">---信工2209---</option>
+			</select>
+			<br />
+			
+			<h3>你选择的兴趣爱好是：{{hobby}}</h3>
+			<input type="checkbox" value="跑步" v-model="hobby" />跑步
+			<input type="checkbox" value="玩游戏" v-model="hobby" />玩游戏
+			<input type="checkbox" value="音乐" v-model="hobby" />音乐
+			<input type="checkbox" value="阅读" v-model="hobby" />阅读
+			<input type="checkbox" value="爬山" v-model="hobby" />爬山
+			<input type="checkbox" value="骑行" v-model="hobby" />骑行
+			<input type="checkbox" value="编程" v-model="hobby" />编程
+			<input type="checkbox" value="徒步" v-model="hobby" />徒步
+			<br />
+			
+			<h3>使用双大括号{{rewHtml}}</h3>
+			<span v-html="rewHtml"></span>
+		</div>
+		
+	</div>
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {
+						msg: 'shsafaf',
+						gender:'男',
+						stuClass:'',
+						hobby:[],
+						rewHtml: '<span style="color: red;">这里显示红色！</span>',
+						isshow:true
+					}
+				}
+				
+				
+			});
+			const vm = app.mount('#app');
+		</script>
+	</body>
+</html>
